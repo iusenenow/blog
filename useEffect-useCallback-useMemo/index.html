@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <link rel="icon" href="/img/favicon.png">
+
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css">
+
+
+  
+<link rel="stylesheet" href="/css/style.css">
+
+
+  
+  <title>useEffect, useCallback, useMemo - Iusenenow</title>
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  <header>
+    <nav id="navbar" class="navbar fixed-nav scrolling-navbar">
+  <div class="container">
+    <div class="mark-wrapper">
+       
+      <div class="title-mark">Peomas</div>
+    </div>
+  
+    <button id="menu-btn" class="btn menu-btn" type="button" data-bs-toggle="collapse" data-bs-target="#nav-menu">
+      <div class="menu-icon"><span></span><span></span><span></span></div>
+    </button>
+  
+    <div id="nav-menu" class="collapse menu-wrapper">
+      <ul>
+        
+          <li>
+            <a href="/">Home </a>
+          </li>
+        
+          <li>
+            <a href="/archives">Archives </a>
+          </li>
+        
+          <li>
+            <a href="/categories">Category </a>
+          </li>
+        
+          <li>
+            <a href="/tags">Tag </a>
+          </li>
+        
+          <li>
+            <a href="/about">About </a>
+          </li>
+        
+        <li class="search-icon">
+          <button class="btn" data-bs-toggle="modal" data-bs-target="#searchModal" aria-label="Search">
+            <i class="fas fa-search"></i>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  </header>
+
+  <main>
+    <div class="container">
+      <div id="main">
+        <div class="row py-5">
+          <div class="col">
+            <div class="row">
+  <div class="left-content">
+    <article class="post-wrapper markdown-body">
+  <h2 class="post-title">
+    useEffect, useCallback, useMemo
+  </h2>
+  <div class="post-meta">
+    <time datetime="Invalid date Invalid date ">2022-06-14</time>
+    
+    
+       
+    
+    
+       
+    
+    
+  </div>
+  
+  <div id="content">
+    <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在目前的react开发中，很多新项目都采用函数组件，因此，我们免不了会接触到hooks。</p>
+<p>此外，Hooks也是前端面试中react方面的一个高频考点，需要掌握常用的几种hooks。</p>
+<p>常用的有</p>
+<p>基本：useState, useEffect, useContext</p>
+<p>额外：useCallback, useMemo, useRef</p>
+<p>刚接触公司的react项目代码时，发现组件都是用的函数组件，不得不去学习hooks，之前只会类组件和react基础</p>
+<p>其中useState不用说了，很容易理解，使我们在函数组件中也能像类组件那样获取、改变state</p>
+<p>项目中很多地方都有useEffect, useCallback, useMemo,初看时感觉这三个都是包着一个东西，有它们跟没有它们感觉也没什么区别，很难分清这三个什么时候要用</p>
+<p>所以这里就略微总结一下，附上一点个人在开发过程中的理解。</p>
+<p>其实这三个区别还是挺明显的，<br>useEffect</p>
+<p>useEffect可以帮助我们在DOM更新完成后执行某些副作用操作，如数据获取，设置订阅以及手动更改 React 组件中的 DOM 等</p>
+<p>有了useEffect，我们可以在函数组件中实现 像类组件中的生命周期那样某个阶段做某件事情 (具有componentDidMount，componentDidUpdate 和 componentWillUnmount的功能)</p>
+<p>&#x2F;&#x2F; 基本用法<br>useEffect(() &#x3D;&gt; {<br>    console.log(‘这是一个不含依赖数组的useEffect，每次render都会执行！’)<br>})</p>
+<p>useEffect 规则</p>
+<pre><code>    没有传第二个参数时，在每次 render 之后都会执行 useEffect中的内容
+    useEffect接受第二个参数来控制跳过执行，下次 render 后如果指定的值没有变化就不会执行
+    useEffect 是在 render 之后浏览器已经渲染结束才执行
+</code></pre>
+<p>useEffect 的第二个参数是可选的，类型是一个数组</p>
+<p>根据第二个参数的不同情况，useEffect具有不同作用</p>
+<ol>
+<li>第二个参数为空数组</li>
+</ol>
+<p>useEffect 只在第一次渲染时执行，由于空数组中没有值，始终没有改变，所以后续render不执行，相当于生命周期中的componentDidMount</p>
+<p>useEffect(() &#x3D;&gt; { console.log(‘只在第一次渲染时执行’) }, []); </p>
+<ol start="2">
+<li>第二个参数为非空数组</li>
+</ol>
+<p>无论数组中有几个元素，数组中只要有任意一项发生了改变，useEffect 都会调用</p>
+<p>useEffect(() &#x3D;&gt; { getStuInfo({ id: stuId }); }, [getStuInfo, stuId]); &#x2F;&#x2F;getStuInfo或者stuId改变时调用getStuInfo函数</p>
+<p>useEffect用作componentWillUnmount</p>
+<p>useEffect可以像让我们在组件即将卸载前做一些清除操作，如清空数据，清除计时器<br>使用方法：只需在现有的useEffect中返回一个函数，函数中为组件即将卸载前要做的操作</p>
+<p>示例</p>
+<p>useEffect(() &#x3D;&gt; {<br>    getStuInfo({ id: stuId });<br>    &#x2F;&#x2F; 返回一个函数，在组件即将卸载前执行<br>    return ()&#x3D;&gt; {<br>        clearTimeout(Timer);   &#x2F;&#x2F; 清除定时器<br>        data &#x3D; null;   &#x2F;&#x2F; 清空页面数据，当我们希望页面切换回来时不显示之前的内容时在组件卸载前清空数据，常用于搜索页面，切回时显示空内容，需重新搜索<br>    }<br>}, [getStuInfo, stuId]); </p>
+<p>useCallback 和 useMemo</p>
+<pre><code>相同点：useCallback 和 useMemo 都是性能优化的手段，类似于类组件中的 shouldComponentUpdate，在子组件中使用 shouldComponentUpdate， 判定该组件的 props 和 state 是否有变化，从而避免每次父组件render时都去重新渲染子组件。
+
+区别：useCallback 和 useMemo 的区别是useCallback返回一个函数，当把它返回的这个函数作为子组件使用时，可以避免每次父组件更新时都重新渲染这个子组件，
+</code></pre>
+<p>const renderButton &#x3D; useCallback(<br>     () &#x3D;&gt; (<br>         <Button type="link"><br>            {buttonText}<br>         </Button><br>     ),<br>     [buttonText]    &#x2F;&#x2F; 当buttonText改变时才重新渲染renderButton<br>);</p>
+<p>useMemo返回的的是一个值，用于避免在每次渲染时都进行高开销的计算。例：</p>
+<p>&#x2F;&#x2F; 仅当num改变时才重新计算结果<br>const result &#x3D; useMemo(() &#x3D;&gt; {<br>    for (let i &#x3D; 0; i &lt; 100000; i++) {<br>      (num * Math.pow(2, 15)) &#x2F; 9;<br>    }<br>}, [num]);</p>
+<p>补充：什么时候用useCallback和useMemo进行优化</p>
+<p>任何的优化都是有代价的，useCallback和useMemo虽然能够避免非必要渲染，但为此也付出了成本，比如保留额外的依赖数组；保留旧值的副本，以便在与先前依赖相同的情况下返回……</p>
+<p>考虑到这些，在我们的项目中什么时候用useCallback和useMemo进行优化呢？</p>
+<p>​目前所在的公司，项目中所有地方都用了useCallback和useMemo，就这块问了一下mentor，他给出的答复是这样的：</p>
+<pre><code>就算有比对代价也比较小，因为哪怕是对象也只是引用比较。我觉得任何时候都用是一个好的习惯，但是大部分时间不用也没什么大问题。但是如果该函数或变量作为 props 传给子组件，请一定要用，避免子组件的非必要渲染
+
+然后要记得 React 的工作方式遵循纯函数，特别是数据的 immutable，因此，使用 memo 很重要。但大部分时候都不足以成为性能瓶颈
+</code></pre>
+
+  </div>
+
+</article>
+  </div>
+  <div class="right-content">
+    <div id="toc" class="toc-wrapper"></div>
+  <div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+     
+  <button id="scroll-to-top" class="btn btn-top" aria-label="Scroll To Top">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+ 
+
+  </main>
+
+  <div class="footer-wrapper">
+  <div class="left-content"></div>
+  <div class="right-content">
+    <div>Copyright &copy;2022</div>
+    <div>Powered By <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> - Theme <a target="_blank" rel="noopener" href="https://github.com/thomasyu929/hexo-theme-peomas">Peomas</a></div>
+  </div>
+</div>
+
+  <div id="searchModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Search</h5>
+        <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="input-wrapper">
+          <i class="fas fa-search"></i>
+          <input id="search" class="search-input" type="text" placeholder="Input content to search..." />
+        </div>
+        <ul id="result" class="list-group result-wrapper">
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.min.js"></script>
+
+
+<script src="/js/prism.js"></script>
+
+
+
+  
+<script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js"></script>
+
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css">
+
+  
+<script src="/js/nprogress.js"></script>
+
+
+
+ 
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.min.js"></script>
+
+  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.11.1/tocbot.css">
+
+ 
+
+
+<script src="/js/event.js"></script>
+
+
+<script src="/js/search.js"></script>
+
+
+<script src="/js/plugin.js"></script>
+
+
+
+</body>
+
+</html>

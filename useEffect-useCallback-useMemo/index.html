@@ -8,15 +8,15 @@
         
         Iusenenow</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="背景在目前的react开发中，很多新项目都采用函数组件，因此，我们免不了会接触到hooks。 此外，Hooks也是前端面试中react方面的一个高频考点，需要掌握常用的几种hooks。 常用的有 基本：useState, useEffect, useContext 额外：useCallback, useMemo, useRef 刚接触公司的react项目代码时，发现组件都是用的函数组件，不得不去学">
+    <meta name="description" content="useEffectuseEffect可以帮助我们在DOM更新完成后执行某些副作用操作，如数据获取，设置订阅以及手动更改React组件中的DOM等。有了useEffect，我们可以在函数组件中实现像类组件中的生命周期那样某个阶段做某件事情（具有componentDidMount, componentDidUpdate, componentWillUnmount的功能) 基本用法123useEffec">
 <meta property="og:type" content="article">
 <meta property="og:title" content="useEffect, useCallback, useMemo">
-<meta property="og:url" content="https://iusenenow.github.io/blog/useEffect-useCallback-useMemo/">
+<meta property="og:url" content="http://localhost:4000/useEffect-useCallback-useMemo/">
 <meta property="og:site_name" content="Iusenenow">
-<meta property="og:description" content="背景在目前的react开发中，很多新项目都采用函数组件，因此，我们免不了会接触到hooks。 此外，Hooks也是前端面试中react方面的一个高频考点，需要掌握常用的几种hooks。 常用的有 基本：useState, useEffect, useContext 额外：useCallback, useMemo, useRef 刚接触公司的react项目代码时，发现组件都是用的函数组件，不得不去学">
+<meta property="og:description" content="useEffectuseEffect可以帮助我们在DOM更新完成后执行某些副作用操作，如数据获取，设置订阅以及手动更改React组件中的DOM等。有了useEffect，我们可以在函数组件中实现像类组件中的生命周期那样某个阶段做某件事情（具有componentDidMount, componentDidUpdate, componentWillUnmount的功能) 基本用法123useEffec">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-06-14T08:19:06.000Z">
-<meta property="article:modified_time" content="2022-06-14T06:21:32.793Z">
+<meta property="article:published_time" content="2022-06-14T06:19:06.000Z">
+<meta property="article:modified_time" content="2022-06-15T02:23:03.827Z">
 <meta property="article:author" content="Iusenenow">
 <meta property="article:tag" content="JavaScript, Node, SQL, TypeScript, React, Vue">
 <meta name="twitter:card" content="summary">
@@ -24,9 +24,9 @@
     
     
         
-            <link rel="stylesheet" href="https://iusenenow.github.io/blog/css/markdown.css">
+            <link rel="stylesheet" href="http://localhost:4000/css/markdown.css">
         
-            <link rel="stylesheet" href="https://iusenenow.github.io/blog/css/july.css">
+            <link rel="stylesheet" href="http://localhost:4000/css/july.css">
         
     
 <meta name="generator" content="Hexo 6.2.0"></head>
@@ -40,13 +40,13 @@
 <div id="menu-outer">
     <div id="menu-inner">
         
-            <a class="false" href="https://iusenenow.github.io/blog/">Home</a>
+            <a class="false" href="http://localhost:4000/">Home</a>
         
-            <a class="false" href="https://iusenenow.github.io/blog/archives">Archives</a>
+            <a class="false" href="http://localhost:4000/archives">Archives</a>
         
-            <a class="false" href="https://iusenenow.github.io/blog/tags">Tag</a>
+            <a class="false" href="http://localhost:4000/tags">Tag</a>
         
-            <a class="false" href="https://iusenenow.github.io/blog/about">About</a>
+            <a class="false" href="http://localhost:4000/about">About</a>
         
     </div>
 </div>
@@ -55,59 +55,35 @@
     <div id="content-inner">
         <article id="post">
     <h1 id="post-title">useEffect, useCallback, useMemo</h1>
-    <time id="post-date" datetime="2022-06-14T08:19:06.000Z">
+    <time id="post-date" datetime="2022-06-14T06:19:06.000Z">
         June 14, 2022
     </time>
     <div id="post-content" class="markdown-body">
-        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在目前的react开发中，很多新项目都采用函数组件，因此，我们免不了会接触到hooks。</p>
-<p>此外，Hooks也是前端面试中react方面的一个高频考点，需要掌握常用的几种hooks。</p>
-<p>常用的有</p>
-<p>基本：useState, useEffect, useContext</p>
-<p>额外：useCallback, useMemo, useRef</p>
-<p>刚接触公司的react项目代码时，发现组件都是用的函数组件，不得不去学习hooks，之前只会类组件和react基础</p>
-<p>其中useState不用说了，很容易理解，使我们在函数组件中也能像类组件那样获取、改变state</p>
-<p>项目中很多地方都有useEffect, useCallback, useMemo,初看时感觉这三个都是包着一个东西，有它们跟没有它们感觉也没什么区别，很难分清这三个什么时候要用</p>
-<p>所以这里就略微总结一下，附上一点个人在开发过程中的理解。</p>
-<p>其实这三个区别还是挺明显的，<br>useEffect</p>
-<p>useEffect可以帮助我们在DOM更新完成后执行某些副作用操作，如数据获取，设置订阅以及手动更改 React 组件中的 DOM 等</p>
-<p>有了useEffect，我们可以在函数组件中实现 像类组件中的生命周期那样某个阶段做某件事情 (具有componentDidMount，componentDidUpdate 和 componentWillUnmount的功能)</p>
-<p>&#x2F;&#x2F; 基本用法<br>useEffect(() &#x3D;&gt; {<br>    console.log(‘这是一个不含依赖数组的useEffect，每次render都会执行！’)<br>})</p>
-<p>useEffect 规则</p>
-<pre><code>    没有传第二个参数时，在每次 render 之后都会执行 useEffect中的内容
-    useEffect接受第二个参数来控制跳过执行，下次 render 后如果指定的值没有变化就不会执行
-    useEffect 是在 render 之后浏览器已经渲染结束才执行
+        <h2 id="useEffect"><a href="#useEffect" class="headerlink" title="useEffect"></a>useEffect</h2><p>useEffect可以帮助我们在DOM更新完成后执行某些副作用操作，如数据获取，设置订阅以及手动更改React组件中的DOM等。<br>有了useEffect，我们可以在函数组件中实现像类组件中的生命周期那样某个阶段做某件事情（具有componentDidMount, componentDidUpdate, componentWillUnmount的功能)</p>
+<h4 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">useEffect(() =&gt; &#123;</span><br><span class="line">  console.log(&#x27;这是一个不含依赖数组的useEffect，每次render都会执行!d&#x27;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h4 id="useEffect规则"><a href="#useEffect规则" class="headerlink" title="useEffect规则"></a>useEffect规则</h4><pre><code>没有传第二个参数时，每次render之后都会执行useEffect中的内容。
+useEffect接受第二个参数来控制跳过执行，下次render后如果指定的值没有变化就不会执行。
+useEffect是在render之后，浏览器已经渲染结束之后才执行。
 </code></pre>
-<p>useEffect 的第二个参数是可选的，类型是一个数组</p>
-<p>根据第二个参数的不同情况，useEffect具有不同作用</p>
-<ol>
-<li>第二个参数为空数组</li>
-</ol>
-<p>useEffect 只在第一次渲染时执行，由于空数组中没有值，始终没有改变，所以后续render不执行，相当于生命周期中的componentDidMount</p>
-<p>useEffect(() &#x3D;&gt; { console.log(‘只在第一次渲染时执行’) }, []); </p>
-<ol start="2">
-<li>第二个参数为非空数组</li>
-</ol>
-<p>无论数组中有几个元素，数组中只要有任意一项发生了改变，useEffect 都会调用</p>
-<p>useEffect(() &#x3D;&gt; { getStuInfo({ id: stuId }); }, [getStuInfo, stuId]); &#x2F;&#x2F;getStuInfo或者stuId改变时调用getStuInfo函数</p>
-<p>useEffect用作componentWillUnmount</p>
-<p>useEffect可以像让我们在组件即将卸载前做一些清除操作，如清空数据，清除计时器<br>使用方法：只需在现有的useEffect中返回一个函数，函数中为组件即将卸载前要做的操作</p>
-<p>示例</p>
-<p>useEffect(() &#x3D;&gt; {<br>    getStuInfo({ id: stuId });<br>    &#x2F;&#x2F; 返回一个函数，在组件即将卸载前执行<br>    return ()&#x3D;&gt; {<br>        clearTimeout(Timer);   &#x2F;&#x2F; 清除定时器<br>        data &#x3D; null;   &#x2F;&#x2F; 清空页面数据，当我们希望页面切换回来时不显示之前的内容时在组件卸载前清空数据，常用于搜索页面，切回时显示空内容，需重新搜索<br>    }<br>}, [getStuInfo, stuId]); </p>
-<p>useCallback 和 useMemo</p>
-<pre><code>相同点：useCallback 和 useMemo 都是性能优化的手段，类似于类组件中的 shouldComponentUpdate，在子组件中使用 shouldComponentUpdate， 判定该组件的 props 和 state 是否有变化，从而避免每次父组件render时都去重新渲染子组件。
+<p>useEffect的第二个参数是可选的，类型是一个数组。根据第二个参数的不同情况，useEffect具有不同作用。</p>
+<ul>
+<li>第二个参数为空数组<br>useEffect只在第一次渲染时执行，由于空数组中没有值，始终没有改变，所以后续render不执行，相当于生命周期中的componentDidMount。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useEffect(() =&gt; &#123; console.log(&#x27;只在第一次渲染时执行&#x27;) &#125;, []); </span><br></pre></td></tr></table></figure></li>
+<li>第二个参数为非空数组<br>无论数组中有几个元素，数组中只要有任意一项发生了改变，useEffect都会调用。<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useEffect(() =&gt; &#123; getStuInfo(&#123; id: stuId &#125;); &#125;, [getStuInfo, stuId]); </span><br></pre></td></tr></table></figure>
+<em><strong>getStuInfo或者stuId改变时调用getStuInfo函数</strong></em></li>
+</ul>
+<h4 id="useEffect用作componentWillUnmount"><a href="#useEffect用作componentWillUnmount" class="headerlink" title="useEffect用作componentWillUnmount"></a>useEffect用作componentWillUnmount</h4><p>useEffect可以像让我们在组件即将卸载前做一些清除操作，如清空数据，清除计时器。<br>使用方法：只需在现有的useEffect中返回一个函数，函数中为组件即将卸载前要做的操作。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">useEffect(() =&gt; &#123; </span><br><span class="line">    getStuInfo(&#123; id: stuId &#125;); </span><br><span class="line">    // 返回一个函数，在组件即将卸载前执行</span><br><span class="line">    return ()=&gt; &#123;</span><br><span class="line">        clearTimeout(Timer);   // 清除定时器</span><br><span class="line">        data = null;   // 清空页面数据，当我们希望页面切换回来不显示之前的内容时，在组件卸载前清空数据，常用于搜索页面，切回时显示空内容，需重新搜索</span><br><span class="line">    &#125;</span><br><span class="line">&#125;, [getStuInfo, stuId]); </span><br></pre></td></tr></table></figure>
+<h2 id="useCallback-和-useMemo"><a href="#useCallback-和-useMemo" class="headerlink" title="useCallback 和 useMemo"></a>useCallback 和 useMemo</h2><pre><code>相同点：useCallback和useMemo都是性能优化的手段，类似于类组件中的shouldComponentUpdate，在子组件中使用shouldComponentUpdate，判定该组件的props和state是否有变化，从而避免每次父组件render时都去重新渲染子组件。
 
-区别：useCallback 和 useMemo 的区别是useCallback返回一个函数，当把它返回的这个函数作为子组件使用时，可以避免每次父组件更新时都重新渲染这个子组件，
+区别：useCallback和useMemo的区别是useCallback返回一个函数，当把它返回的这个函数作为子组件使用时，可以避免每次父组件更新时都重新渲染这个子组件。
 </code></pre>
-<p>const renderButton &#x3D; useCallback(<br>     () &#x3D;&gt; (<br>         <Button type="link"><br>            {buttonText}<br>         </Button><br>     ),<br>     [buttonText]    &#x2F;&#x2F; 当buttonText改变时才重新渲染renderButton<br>);</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">const renderButton = useCallback(</span><br><span class="line">     () =&gt; (</span><br><span class="line">         &lt;Button type=&quot;link&quot;&gt;</span><br><span class="line">            &#123;buttonText&#125;</span><br><span class="line">         &lt;/Button&gt;</span><br><span class="line">     ),</span><br><span class="line">     [buttonText] // 当buttonText改变时才重新渲染renderButton</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
 <p>useMemo返回的的是一个值，用于避免在每次渲染时都进行高开销的计算。例：</p>
-<p>&#x2F;&#x2F; 仅当num改变时才重新计算结果<br>const result &#x3D; useMemo(() &#x3D;&gt; {<br>    for (let i &#x3D; 0; i &lt; 100000; i++) {<br>      (num * Math.pow(2, 15)) &#x2F; 9;<br>    }<br>}, [num]);</p>
-<p>补充：什么时候用useCallback和useMemo进行优化</p>
-<p>任何的优化都是有代价的，useCallback和useMemo虽然能够避免非必要渲染，但为此也付出了成本，比如保留额外的依赖数组；保留旧值的副本，以便在与先前依赖相同的情况下返回……</p>
-<p>考虑到这些，在我们的项目中什么时候用useCallback和useMemo进行优化呢？</p>
-<p>​目前所在的公司，项目中所有地方都用了useCallback和useMemo，就这块问了一下mentor，他给出的答复是这样的：</p>
-<pre><code>就算有比对代价也比较小，因为哪怕是对象也只是引用比较。我觉得任何时候都用是一个好的习惯，但是大部分时间不用也没什么大问题。但是如果该函数或变量作为 props 传给子组件，请一定要用，避免子组件的非必要渲染
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 仅当num改变时才重新计算结果</span><br><span class="line">const result = useMemo(() =&gt; &#123;</span><br><span class="line">    for (let i = 0; i &lt; 100000; i++) &#123;</span><br><span class="line">      (num * Math.pow(2, 15)) / 9;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;, [num]);</span><br></pre></td></tr></table></figure>
+<h3 id="什么时候用useCallback和useMemo进行优化"><a href="#什么时候用useCallback和useMemo进行优化" class="headerlink" title="什么时候用useCallback和useMemo进行优化"></a>什么时候用useCallback和useMemo进行优化</h3><p>任何的优化都是有代价的，useCallback和useMemo虽然能够避免非必要渲染，但为此也付出了成本，比如保留额外的依赖数组；保留旧值的副本，以便在与先前依赖相同的情况下返回……<br>考虑到这些，在我们的项目中什么时候用useCallback和useMemo进行优化呢？<br>​目前所在的公司，项目中所有地方都用了useCallback和useMemo，就这块问了一下mentor，他给出的答复是这样的：</p>
+<pre><code>就算有比对代价也比较小，因为哪怕是对象也只是引用比较。我觉得任何时候都用是一个好的习惯，但是大部分时间不用也没什么大问题。但是如果该函数或变量作为props传给子组件，请一定要用，避免子组件的非必要渲染。
 
-然后要记得 React 的工作方式遵循纯函数，特别是数据的 immutable，因此，使用 memo 很重要。但大部分时候都不足以成为性能瓶颈
+然后要记得React的工作方式遵循纯函数，特别是数据的immutable，因此，使用memo很重要。但大部分时候都不足以成为性能瓶颈。
 </code></pre>
 
     </div>
@@ -132,13 +108,13 @@
 
 
     
-        <script src="https://iusenenow.github.io/blog/js/jquery-3.4.1.min.js"></script>
+        <script src="http://localhost:4000/js/jquery-3.4.1.min.js"></script>
     
-        <script src="https://iusenenow.github.io/blog/js/highlight-9.13.1.min.js"></script>
+        <script src="http://localhost:4000/js/highlight-9.13.1.min.js"></script>
     
-        <script src="https://iusenenow.github.io/blog/js/transition.js"></script>
+        <script src="http://localhost:4000/js/transition.js"></script>
     
-        <script src="https://iusenenow.github.io/blog/js/smooth-scroll.min.js"></script>
+        <script src="http://localhost:4000/js/smooth-scroll.min.js"></script>
     
 
 
